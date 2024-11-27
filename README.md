@@ -34,10 +34,10 @@ Set envirnonment variables if needed
       FLASK_ENV=development
       SECRET_KEY=your_secret_key
 
-Run the application:
+Run the application using
    ```flask run
 
-Open in browser
+Open in browser using
    ```http://127.0.0.1:5000
 
     
