@@ -35,10 +35,10 @@ Set envirnonment variables if needed
       SECRET_KEY=your_secret_key
 
 Run the application:
-```flask run
+   ```flask run
 
 Open in browser
-```http://127.0.0.1:5000
+   ```http://127.0.0.1:5000
 
     
 
