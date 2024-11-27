@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quiz Evaluator</title>
+    <link rel="icon" href="https://www.iconsdb.com/icons/preview/purple/checkmark-xxl.png" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #da2eda 0%, #256ed4 100%);
+            --secondary-gradient: linear-gradient(45deg, #ff6a88 0%, #ee9ca7 100%);
+            --claude-background: #f0f4f8;
+            --text-dark: #1a2b3c;
+            --text-light: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+        }
+
+        .bottom-right-links {
+            position: fixed;
+            bottom: 20px;
+            right: 25px;
+            font-size: 14px;
+            color: #000;
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .bottom-right-links a {
+            color: #2575fc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .bottom-right-links a:hover {
+            color: #da2eda;
+        }
+
+        /* Custom Scrollbar */
+        *::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border-radius: 10px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--claude-background);
+            background-image: url('https://r2.flux1.ai/result-HDQo4t9nUJ.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(0px);
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 750px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: scale(1.02) rotateX(2deg) rotateY(-2deg);
+        }
+
+        h1 {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            margin-bottom: 30px;
+            position: relative;
+            display: inline-block;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        h1:hover {
+            transform: scale(1.05);
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            margin-bottom: 25px;
+            z-index: 2;
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+
+        .file-upload-wrapper label {
+            display: block;
+            border: 2px dashed #b300ff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .file-upload-wrapper label:hover {
+            border-color: #2575fc;
+            background-color: rgba(37, 117, 252, 0.1);
+        }
+
+        #upload-btn {
+            background: var(--primary-gradient);
+            color: var(--text-light);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(37, 117, 252, 0.5);
+        }
+
+        .loading {
+            display: none;
+            color: #2575fc;
+            margin-top: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: left;
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            line-height: 1.6; /* Increased line height */
+            word-wrap: break-word; /* Ensure long words break to fit the container */
+            white-space: pre-wrap; /* Preserve whitespace and line breaks */
+        }
+
+        .spinner {
+            border: 3px solid rgba(37, 117, 252, 0.3);
+            border-top-color: #2575fc;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-brain"></i> NeuralGrader </h1>
+        
+        <form action="/" method="post" enctype="multipart/form-data" id="upload-form">
+            <div class="file-upload-wrapper">
+                <input type="file" name="file" id="file-input" required>
+                <label for="file-input">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag and drop quiz document or click to upload</p>
+                    <span class="file-name"></span>
+                </label>
+            </div>
+            
+            <button type="submit" id="upload-btn">Evaluate Quiz</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Analyzing Quiz... Please wait
+        </div>
+
+        {% if result %}
+            <div class="result">
+                <h3><i class="fas fa-file-alt"></i> Quiz Analysis</h3>
+                <p>{{ result }}</p>
+            </div>
+        {% endif %}
+    </div>
+    <div class="bottom-right-links">
+        <a target="_blank">Awesome Developers</a> 
+        <a href="https://www.linkedin.com/in/ansersohaib/" target="_blank">Anser</a> |
+        <a href="https://www.linkedin.com/in/zuha-fatima-176360255/" target="_blank">Zuha</a> |
+        <a href="https://www.linkedin.com/in/zohair-shakeel-7838331b5/" target="_blank">Zohair</a>
+
+    </div>
+
+    <script>
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const fileName = e.target.value.split('\\').pop();
+            document.querySelector('.file-name').textContent = fileName ? fileName : 'No file chosen';
+        });
+
+        document.getElementById("upload-form").addEventListener("submit", function() {
+            document.getElementById("loading").style.display = "flex";
+        });
+    </script>
+</body>
+</html>
