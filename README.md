@@ -4,6 +4,10 @@ An AI-driven web application to automate the evaluation of quizzes, leveraging O
 ![NeuralGrader](https://github.com/user-attachments/assets/c8ca6d61-c832-4ef9-8165-fc14a599e184)
 
 ---
+# Grading in under 30 seconds
+https://github.com/user-attachments/assets/b0032314-a449-46b2-9b2a-c88422f65386
+
+
 
 ## Features
 - **Automated Grading**: Automatically grades quizzes with high accuracy.
